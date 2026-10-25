@@ -11,28 +11,36 @@
 
 ## 快速启动
 
-### 后端
+### 一键启动（推荐，新设备直接可用）
 
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env  # 配置环境变量
-uvicorn app.main:app --reload --port 8000
+git clone https://github.com/wangzhipeng666/recipe-website.git
+cd recipe-website
+./start.sh
 ```
 
-API 文档：http://localhost:8000/docs
+脚本会自动完成：创建 Python 虚拟环境并安装依赖 → 检查数据库有数据（空库拒绝启动）→ 安装前端依赖 → 启动前后端。
 
-### 前端
+- 环境要求：Python 3.10+（推荐 3.10~3.13）、Node.js 20+
+- 菜谱数据、图片、字体全部随仓库携带，无需额外准备
+- 前端：http://localhost:5180 ｜ 后端文档：http://localhost:9527/docs
+
+### 手动启动
 
 ```bash
+# 后端（注意在 backend 目录内启动）
+cd backend
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --port 9527
+
+# 前端（另开终端）
 cd frontend
 npm install
 npm run dev
 ```
 
-访问：http://localhost:5173
+访问：http://localhost:5180
 
 ## 功能
 

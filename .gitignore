@@ -1,1 +1,20 @@
-start.sh
+# 系统文件
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+backend/venv/
+
+# 数据库备份（卡片生成脚本每次运行自动产生）
+*.db.bak-*
+
+# 构建缓存与产物
+.vite/
+frontend/dist/
+
+# 本地源码备份目录
+.backup-*/
+
+# 日志
+*.log
