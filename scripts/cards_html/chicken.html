@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../fonts_local.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1024px; height:768px; overflow:hidden;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255,255,255,.5) 0 26px, transparent 27px),
+      radial-gradient(circle at 85% 85%, rgba(255,255,255,.4) 0 34px, transparent 35px),
+      radial-gradient(rgba(210,190,150,.38) 1.2px, transparent 1.3px),
+      radial-gradient(rgba(210,190,150,.28) 1.2px, transparent 1.3px),
+      #FAF2E0;
+    background-size: auto, auto, 26px 26px, 34px 34px, auto;
+    background-position: 0 0, 0 0, 0 0, 13px 17px, 0 0; }
+  .card { position:relative; width:1024px; height:768px; padding:22px 26px;
+    font-family:"ZCOOL KuaiLe","Hiragino Sans GB",sans-serif; color:#4A322A;
+    display:flex; flex-direction:column; }
+  .frame { position:absolute; inset:12px; border:2.5px dashed rgba(200,69,44,.42);
+    border-radius:22px; pointer-events:none; }
+  .topzone { display:flex; gap:20px; align-items:stretch; }
+  .leftzone { flex:1; min-width:0; display:flex; flex-direction:column; gap:12px; }
+  .rightzone { width:312px; flex:none; display:flex; flex-direction:column; gap:14px;
+    align-items:center; }
+  .head { display:flex; align-items:center; gap:16px; }
+  .titleblock { flex:1; min-width:0; }
+  h1 { font-size:54px; line-height:1.05; letter-spacing:3px; font-weight:400; }
+  .sub { display:flex; gap:10px; align-items:center; margin-top:8px; }
+  .chip { display:flex; align-items:center; gap:5px; padding:3px 12px; border-radius:999px;
+    font-size:16px; border:2px solid rgba(74,50,42,.35); background:rgba(255,251,240,.8); }
+  .chip.hot { border-color:#C8452C; color:#C8452C; }
+  .hero { position:relative; width:312px; flex:none; }
+  .blob { position:absolute; inset:-15px; z-index:0; }
+  .blob i { position:absolute; border-radius:50%; filter:blur(15px); }
+  .heroframe { position:relative; z-index:1; background:#FFFBF0; border:3px solid #4A322A;
+    border-radius:16px; padding:7px; box-shadow:3px 4px 0 rgba(74,50,42,.18);
+    transform:rotate(.9deg); overflow:hidden; }
+  .heroframe svg { width:100%; height:auto; display:block; }
+  .tape { position:absolute; z-index:3; width:92px; height:24px; background:rgba(245,196,69,.72);
+    border:1.5px dashed rgba(74,50,42,.4); top:-11px; left:20px; transform:rotate(-5deg); }
+  .seal { position:absolute; z-index:3; right:-12px; bottom:-12px; width:74px; height:74px;
+    border-radius:13px; background:#C8452C; color:#FFF6E8; display:flex; align-items:center;
+    justify-content:center; font-size:40px; transform:rotate(-6deg);
+    box-shadow:2px 3px 0 rgba(74,50,42,.25);
+    outline:2px solid rgba(200,69,44,.35); outline-offset:3px; }
+  .tipnote { position:relative; z-index:1; width:100%; background:rgba(245,196,69,.32);
+    border:2px dashed rgba(200,69,44,.5); border-radius:12px; padding:8px 12px 10px;
+    transform:rotate(-.7deg); }
+  .tiphead { font-size:16px; color:#C8452C; margin-bottom:2px; }
+  .tipbody { font-family:"Ma Shan Zheng","ZCOOL KuaiLe",serif; font-size:16px;
+    line-height:1.36; color:#8A5A2B; }
+  .sec { background:rgba(255,251,240,.86); border:2.5px solid rgba(74,50,42,.85);
+    border-radius:16px; padding:10px 14px 12px; position:relative; overflow:hidden;
+    flex:none; }
+  .sec.stepsec { flex:1 1 0; min-height:0; display:flex; flex-direction:column;
+    margin-top:12px; }
+  .sectitle { display:flex; align-items:center; gap:9px; font-size:24px; color:#C8452C;
+    margin-bottom:8px; }
+  .sectitle .line { flex:1; height:3px; border-radius:2px;
+    background:repeating-linear-gradient(90deg, rgba(200,69,44,.4) 0 12px, transparent 12px 18px); }
+  .ings { display:flex; flex-wrap:wrap; gap:6px 8px; }
+  .ing { display:flex; align-items:center; gap:5px; padding:3px 10px 3px 6px;
+    background:#FFF; border:1.8px solid rgba(74,50,42,.8); border-radius:999px;
+    font-size:14px; white-space:nowrap; }
+  .ing svg { width:20px; height:20px; flex:none; }
+  .ing span { min-width:0; }
+  .steps { display:flex; flex-direction:column; gap:7px; }
+  .step { display:flex; align-items:flex-start; gap:10px; min-height:0; }
+  .step svg { width:24px; height:24px; flex:none; margin-top:3px; }
+  .badge { flex:none; border-radius:50%; background:#F5C445; border:2.5px solid #4A322A;
+    color:#4A322A; display:flex; align-items:center; justify-content:center; font-size:18px; margin-top:2px; }
+  .stxt { font-size:15px; line-height:1.34; padding-top:4px; min-width:0; }
+  .step.many .stxt { font-size:14px; line-height:1.3; padding-top:3px; }
+  .step.lots .stxt { font-size:13px; line-height:1.26; padding-top:3px; }
+  .step.tiny .stxt { font-size:12px; line-height:1.22; padding-top:2px; }
+  .step.tiny svg { width:19px; height:19px; margin-top:2px; }
+  .step.tiny { gap:7px; }
+  .step.lots svg { width:21px; height:21px; margin-top:2px; }
+  .step.lots { gap:8px; }
+  .steps.tight { gap:5px; }
+  .stepsec .steps { flex:1; justify-content:space-between; }
+  .ing span{font-size:13.0px}
+</style></head>
+<body><div class="card">
+  <div class="frame"></div>
+  <div style="position:absolute;left:30px;top:122px;width:16px;height:16px;opacity:0.85;transform:rotate(-10deg)"><svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21C5 15 2 11 2 7.3 2 4.4 4.4 2 7.3 2 9.2 2 11 3 12 4.6 13 3 14.8 2 16.7 2 19.6 2 22 4.4 22 7.3c0 3.7-3 7.7-10 13.7Z" fill="#E8763A"/></svg></div><div style="position:absolute;left:981px;top:330px;width:13px;height:13px;opacity:0.7;transform:rotate(7deg)"><svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21C5 15 2 11 2 7.3 2 4.4 4.4 2 7.3 2 9.2 2 11 3 12 4.6 13 3 14.8 2 16.7 2 19.6 2 22 4.4 22 7.3c0 3.7-3 7.7-10 13.7Z" fill="#E8763A"/></svg></div><div style="position:absolute;left:935px;top:742px;width:14px;height:14px;opacity:0.8;transform:rotate(5deg)"><svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21C5 15 2 11 2 7.3 2 4.4 4.4 2 7.3 2 9.2 2 11 3 12 4.6 13 3 14.8 2 16.7 2 19.6 2 22 4.4 22 7.3c0 3.7-3 7.7-10 13.7Z" fill="#F2A9A0"/></svg></div>
+  <div style="position:absolute;left:34px;top:300px;width:14px;height:14px;opacity:0.9"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#F2C94C"/></svg></div><div style="position:absolute;left:986px;top:560px;width:12px;height:12px;opacity:0.9"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#F2C94C"/></svg></div><div style="position:absolute;left:300px;top:748px;width:11px;height:11px;opacity:0.75"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#E8763A"/></svg></div><div style="position:absolute;left:680px;top:26px;width:12px;height:12px;opacity:0.9"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#F2C94C"/></svg></div>
+  <div class="topzone">
+    <div class="leftzone">
+      <div class="head">
+        <svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><ellipse cx="48" cy="88" rx="30" ry="6" fill="#8A5A33" opacity=".18"/><ellipse cx="48" cy="52" rx="30" ry="27" fill="#FFF9EC" stroke="#4A322A" stroke-width="3" stroke-linejoin="round"/><path d="M40 24c2-6 8-8 10-2s-4 6-4 6" fill="#E8563A" stroke="#4A322A" stroke-width="3" stroke-linejoin="round"/><path d="M74 34c6 0 9 4 8 8M82 46c-4-1-7 1-8 4" stroke="#F2A9A0" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M30 62c-6 4-14 3-16-2 5-6 12-6 16-2Z" fill="#F2A9A0" stroke="#4A322A" stroke-width="3" stroke-linejoin="round"/><circle cx="39.0" cy="48" r="2.2" fill="#4A322A"/><circle cx="57.0" cy="48" r="2.2" fill="#4A322A"/><circle cx="36.8" cy="44.8" r="1.4" fill="#fff" opacity=".9"/><circle cx="54.8" cy="44.8" r="1.4" fill="#fff" opacity=".9"/><circle cx="33.0" cy="55.0" r="3.4" fill="#F2A9A0" opacity=".85"/><circle cx="63.0" cy="55.0" r="3.4" fill="#F2A9A0" opacity=".85"/><path d="M 44.0 53.0 q 4.0 3.4 8.0 0" fill="none" stroke="#4A322A" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div class="titleblock">
+          <h1>山东炒鸡</h1>
+          <div class="sub">
+            <div class="chip hot">★ 中等</div>
+            <div class="chip">⏱ 40分钟</div>
+            <div class="chip" style="color:#7BA05B">家常菜</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sectitle">🧺 食材准备<div class="line"></div></div>
+        <div class="ings"><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 5c3.5 0 6 2.5 6 5.5S17.5 16 14 16H9c-2.2 0-4-1.6-4-3.7C5 9.6 7.5 5 14 5Z" fill="#C8873B" stroke="#4A322A" stroke-width="1.6"/><circle cx="5.6" cy="18" r="2" fill="#FDF3E3" stroke="#4A322A" stroke-width="1.4"/></svg><span>半只新鲜公鸡</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 4c1 4-1 12-6 15-3 1.7-6 .3-5.6-2C6 12 11 5 17 4Z" fill="#D14B33" stroke="#4A322A" stroke-width="1.6"/><path d="M17 4l2-1" stroke="#7BA05B" stroke-width="2.4" stroke-linecap="round"/></svg><span>小米辣 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 4c1 4-1 12-6 15-3 1.7-6 .3-5.6-2C6 12 11 5 17 4Z" fill="#D14B33" stroke="#4A322A" stroke-width="1.6"/><path d="M17 4l2-1" stroke="#7BA05B" stroke-width="2.4" stroke-linecap="round"/></svg><span>干辣椒 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="10" r="3.4" fill="#96422B" stroke="#4A322A" stroke-width="1.4"/><circle cx="16" cy="8" r="2.6" fill="#96422B" stroke="#4A322A" stroke-width="1.4"/><circle cx="15" cy="16" r="3" fill="#B0553B" stroke="#4A322A" stroke-width="1.4"/></svg><span>青花椒 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l2 5 5 1-3.6 3.8L16 18l-4-2-4 2 .6-5.2L5 9l5-1 2-5Z" fill="#B0703A" stroke="#4A322A" stroke-width="1.5"/></svg><span>白芷 1个</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l2 5 5 1-3.6 3.8L16 18l-4-2-4 2 .6-5.2L5 9l5-1 2-5Z" fill="#B0703A" stroke="#4A322A" stroke-width="1.5"/></svg><span>八角 1个</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4c4 0 7 3 7 7 0 5-3 9-7 9s-7-4-7-9c0-4 3-7 7-7Z" fill="#FBF5E6" stroke="#4A322A" stroke-width="1.6"/><path d="M12 8v11" stroke="#D9CBB0" stroke-width="1.6"/></svg><span>大蒜头 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 15c-2-4 1-9 6-9 5 0 8 3 7 7-1 3-4 5-8 4l-3 3-2-2 2-3Z" fill="#EFD9A7" stroke="#4A322A" stroke-width="1.6"/></svg><span>姜片 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" fill="#8FCB6E" stroke="#4A322A" stroke-width="1.6"/><circle cx="12" cy="12" r="3.4" fill="#F2FFE3"/></svg><span>葱段 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="7.5" fill="#F2C98A" stroke="#4A322A" stroke-width="1.6"/></svg><span>螺旋椒 适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="8" height="14" rx="2.4" fill="#6B3A1F" stroke="#4A322A" stroke-width="1.6"/><rect x="10" y="2.6" width="4" height="4" rx="1.2" fill="#4A322A"/><rect x="9.6" y="9" width="2" height="7" rx="1" fill="#E8D4B8" opacity=".7"/></svg><span>生抽 2勺</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="8" height="14" rx="2.4" fill="#6B3A1F" stroke="#4A322A" stroke-width="1.6"/><rect x="10" y="2.6" width="4" height="4" rx="1.2" fill="#4A322A"/><rect x="9.6" y="9" width="2" height="7" rx="1" fill="#E8D4B8" opacity=".7"/></svg><span>老抽 2勺</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="8" width="6" height="13" rx="2" fill="#E8DFB0" stroke="#4A322A" stroke-width="1.6"/><rect x="10.6" y="3" width="2.8" height="5" fill="#4A322A"/></svg><span>料酒 2勺</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="8" height="14" rx="2.4" fill="#6B3A1F" stroke="#4A322A" stroke-width="1.6"/><rect x="10" y="2.6" width="4" height="4" rx="1.2" fill="#4A322A"/><rect x="9.6" y="9" width="2" height="7" rx="1" fill="#E8D4B8" opacity=".7"/></svg><span>蚝油 1勺</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 8h12l1 11c0 1-1 2-2 2H7c-1 0-2-1-2-2L6 8Z" fill="#A0522D" stroke="#4A322A" stroke-width="1.6"/><rect x="7" y="4" width="10" height="4" rx="1.6" fill="#8B4513" stroke="#4A322A" stroke-width="1.5"/></svg><span>黄豆酱 1勺</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 8h12l1 11c0 1-1 2-2 2H7c-1 0-2-1-2-2L6 8Z" fill="#A0522D" stroke="#4A322A" stroke-width="1.6"/><rect x="7" y="4" width="10" height="4" rx="1.6" fill="#8B4513" stroke="#4A322A" stroke-width="1.5"/></svg><span>甜面酱 1勺</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19c1-4 3-6 6-6s5 2 6 6H6Z" fill="#FFFFFF" stroke="#4A322A" stroke-width="1.6"/></svg><span>白糖 少许</span></div></div>
+      </div>
+    </div>
+    <div class="rightzone">
+      <div class="hero">
+        <div class="blob">
+          <i style="left:2%;top:14%;width:180px;height:115px;background:#F5C445;opacity:.5"></i>
+          <i style="right:0%;bottom:16%;width:200px;height:130px;background:#F2A9A0;opacity:.42"></i>
+          <i style="left:24%;top:60%;width:150px;height:95px;background:#9FC98A;opacity:.4"></i>
+        </div>
+        <div class="heroframe"><svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768">
+<defs>
+  <radialGradient id="bgchicken" cx="50%" cy="38%" r="80%">
+    <stop offset="0%" stop-color="#FFF8E9"/>
+    <stop offset="55%" stop-color="#FFEAC8"/>
+    <stop offset="100%" stop-color="#FFDCA8"/>
+  </radialGradient>
+  <linearGradient id="woodchicken" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#DCA768"/>
+    <stop offset="100%" stop-color="#C58E4E"/>
+  </linearGradient>
+</defs>
+<rect width="1024" height="768" fill="url(#bgchicken)"/>
+<circle cx="90" cy="120" r="46" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="930" cy="90" r="34" fill="#FFFFFF" opacity="0.45"/>
+<circle cx="860" cy="240" r="22" fill="#FFFFFF" opacity="0.4"/>
+<circle cx="150" cy="300" r="18" fill="#FFFFFF" opacity="0.35"/>
+<circle cx="760" cy="60" r="16" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="60" cy="430" r="26" fill="#FFFFFF" opacity="0.3"/>
+<circle cx="980" cy="380" r="30" fill="#FFFFFF" opacity="0.3"/>
+<circle cx="250" cy="60" r="20" fill="#FFFFFF" opacity="0.4"/>
+<rect x="-20" y="618" width="1064" height="170" rx="26" fill="url(#woodchicken)" stroke="#4A322A" stroke-width="5"/>
+<line x1="120" y1="668" x2="920" y2="668" stroke="#B47E42" stroke-width="3" opacity="0.5"/>
+<line x1="260" y1="708" x2="800" y2="708" stroke="#B47E42" stroke-width="3" opacity="0.35"/>
+<ellipse cx="512" cy="490" rx="278" ry="30" fill="#8A5A33" opacity="0.3"/>
+<ellipse cx="512" cy="462" rx="292" ry="98" fill="#FFFFFF" stroke="#4A322A" stroke-width="6"/><ellipse cx="512" cy="458" rx="216.07999999999998" ry="64.68" fill="none" stroke="#E4D9CB" stroke-width="5"/>
+<g transform="translate(327 444) rotate(-14) scale(1.05)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(417 422) rotate(8) scale(0.9)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(497 440) rotate(-6) scale(1.1)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(587 420) rotate(12) scale(0.85)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(682 446) rotate(-10) scale(1.0)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(372 488) rotate(6) scale(0.9)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(467 482) rotate(-12) scale(1.0)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(567 486) rotate(8) scale(0.95)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(662 492) rotate(-5) scale(0.85)"><path d="M -44 -10 Q -40 -38 -8 -40 Q 36 -42 46 -8 Q 50 22 18 32 Q -26 38 -42 12 Q -50 -2 -44 -10 Z" fill="#C8873B" stroke="#4A322A" stroke-width="5"/><path d="M -30 -16 Q -6 -30 26 -18" fill="none" stroke="#E2A85C" stroke-width="8" stroke-linecap="round"/><path d="M -26 12 Q 4 24 34 8" fill="none" stroke="#8C5A22" stroke-width="7" stroke-linecap="round" opacity="0.8"/><circle cx="-20" cy="-4" r="4" fill="#8C5A22"/><circle cx="12" cy="-12" r="3.4" fill="#8C5A22"/></g>
+<g transform="translate(442 412) rotate(5)"><rect x="-22" y="-20" width="44" height="40" rx="9" fill="#4E9A45" stroke="#4A322A" stroke-width="4.5"/><rect x="-12" y="-10" width="16" height="12" rx="4" fill="#FFFFFF" opacity="0.35"/></g>
+<g transform="translate(547 410) rotate(-10)"><rect x="-22" y="-20" width="44" height="40" rx="9" fill="#D64541" stroke="#4A322A" stroke-width="4.5"/><rect x="-12" y="-10" width="16" height="12" rx="4" fill="#FFFFFF" opacity="0.35"/></g>
+<g transform="translate(637 422) rotate(-10)"><rect x="-22" y="-20" width="44" height="40" rx="9" fill="#4E9A45" stroke="#4A322A" stroke-width="4.5"/><rect x="-12" y="-10" width="16" height="12" rx="4" fill="#FFFFFF" opacity="0.35"/></g>
+<g transform="translate(337 468) rotate(-10)"><rect x="-22" y="-20" width="44" height="40" rx="9" fill="#D64541" stroke="#4A322A" stroke-width="4.5"/><rect x="-12" y="-10" width="16" height="12" rx="4" fill="#FFFFFF" opacity="0.35"/></g>
+<g transform="translate(607 462) rotate(-10)"><rect x="-22" y="-20" width="44" height="40" rx="9" fill="#4E9A45" stroke="#4A322A" stroke-width="4.5"/><rect x="-12" y="-10" width="16" height="12" rx="4" fill="#FFFFFF" opacity="0.35"/></g>
+<g transform="translate(712 470) rotate(5)"><rect x="-22" y="-20" width="44" height="40" rx="9" fill="#D64541" stroke="#4A322A" stroke-width="4.5"/><rect x="-12" y="-10" width="16" height="12" rx="4" fill="#FFFFFF" opacity="0.35"/></g>
+<circle cx="282" cy="422" r="5.6000000000000005" fill="#6FBF5A" stroke="#4A322A" stroke-width="2.5"/><circle cx="282" cy="422" r="2.08" fill="#4E9640"/><circle cx="522" cy="390" r="5.6000000000000005" fill="#6FBF5A" stroke="#4A322A" stroke-width="2.5"/><circle cx="522" cy="390" r="2.08" fill="#4E9640"/><circle cx="737" cy="428" r="5.6000000000000005" fill="#6FBF5A" stroke="#4A322A" stroke-width="2.5"/><circle cx="737" cy="428" r="2.08" fill="#4E9640"/>
+<path d="M 402 400 A 90 16 0 0 1 582 398.4" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.35"/>
+<path d="M 552 366 c -19.5 -16.2 19.5 -28.8 0 -45.0 c -19.5 -16.2 19.5 -28.8 0 -81.0" fill="none" stroke="#FFFFFF" stroke-width="8.25" stroke-linecap="round" opacity="0.5"/>
+<path d="M 595.5 376.5 c -19.5 -16.2 19.5 -28.8 0 -45.0 c -19.5 -16.2 19.5 -28.8 0 -81.0" fill="none" stroke="#FFFFFF" stroke-width="8.25" stroke-linecap="round" opacity="0.5"/>
+<path d="M 508.5 376.5 c -19.5 -16.2 19.5 -28.8 0 -45.0 c -19.5 -16.2 19.5 -28.8 0 -81.0" fill="none" stroke="#FFFFFF" stroke-width="8.25" stroke-linecap="round" opacity="0.5"/>
+<path d="M 120 144 Q 125.72 164.28 146 170 Q 125.72 175.72 120 196 Q 114.28 175.72 94 170 Q 114.28 164.28 120 144 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 158 115 Q 160.86 125.14 171 128 Q 160.86 130.86 158 141 Q 155.14 130.86 145 128 Q 155.14 125.14 158 115 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 900 178 Q 904.84 195.16 922 200 Q 904.84 204.84 900 222 Q 895.16 204.84 878 200 Q 895.16 195.16 900 178 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 938 151 Q 940.42 159.58 949 162 Q 940.42 164.42 938 173 Q 935.58 164.42 927 162 Q 935.58 159.58 938 151 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 830 78 Q 832.64 87.36 842 90 Q 832.64 92.64 830 102 Q 827.36 92.64 818 90 Q 827.36 87.36 830 78 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 210 470 Q 212.2 477.8 220 480 Q 212.2 482.2 210 490 Q 207.8 482.2 200 480 Q 207.8 477.8 210 470 Z" fill="#FFC94D" opacity="0.95"/>
+</svg></div>
+        <div class="tape"></div>
+        <div class="seal">山</div>
+      </div>
+      <div class="tipnote"><div class="tiphead">✦ 小贴士</div><div class="tipbody">鸡肉提前泡水去血水，螺旋椒临出锅前放保持口感</div></div>
+    </div>
+  </div>
+  <div class="sec stepsec">
+    <div class="sectitle">🍳 做法步骤<div class="line"></div></div>
+    <div class="steps"><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">1</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 8h14l-1.4 11a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 8Z" fill="#CFE3F0" stroke="#4A322A" stroke-width="1.6"/><path d="M5 8c1.4 2 3 0 4.4 1.6S12 12 13.6 10 16 8 19 8" stroke="#9FC2D8" stroke-width="1.5" fill="none"/></svg><span class="stxt">半只鸡放入盆中，泡1-2小时，倒掉血水</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">2</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="18" height="7" rx="3.5" fill="#4A4441" stroke="#4A322A" stroke-width="1.6"/><path d="M7 20c1-1.6 2-1.6 2.6 0M12 20c1-1.6 2-1.6 2.6 0M17 20c1-1.6 2-1.6 2.6 0" stroke="#E8763A" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="9" cy="12.4" r="1.2" fill="#F2C94C"/><circle cx="14.6" cy="12.4" r="1.2" fill="#F2C94C"/></svg><span class="stxt">鸡肉沥干水份，起锅烧油，油热下姜片炸至微黄</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">3</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 10h15c2 0 3 1.4 3 3.2S19.6 17 17.4 17H8L3 10Z" fill="#5A6570" stroke="#4A322A" stroke-width="1.6"/><path d="M8 17l-2 3M13 17l-2 3" stroke="#4A322A" stroke-width="1.8" stroke-linecap="round"/><path d="M9 6c0-1.4 1.6-1.4 1.6-2.8M13.4 6c0-1.4 1.6-1.4 1.6-2.8" stroke="#E8763A" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="stxt">关小火放入小米辣、干辣椒、青花椒、白芷、八角、蒜头炒香（螺旋椒除外）</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">4</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 10h15c2 0 3 1.4 3 3.2S19.6 17 17.4 17H8L3 10Z" fill="#5A6570" stroke="#4A322A" stroke-width="1.6"/><path d="M8 17l-2 3M13 17l-2 3" stroke="#4A322A" stroke-width="1.8" stroke-linecap="round"/><path d="M9 6c0-1.4 1.6-1.4 1.6-2.8M13.4 6c0-1.4 1.6-1.4 1.6-2.8" stroke="#E8763A" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="stxt">倒入鸡肉炒至微黄</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">5</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.6 3.6L8 14h5l-2.4 6.4L18 9h-5l1.6-5.4Z" fill="#F2C94C" stroke="#4A322A" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="stxt">倒入提前调好的料汁（生抽2勺、老抽2勺、料酒2勺、蚝油1勺、黄豆酱1勺、甜面酱1勺、少许白糖）</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">6</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 9h16v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9Z" fill="#D96C4F" stroke="#4A322A" stroke-width="1.6"/><rect x="3" y="7" width="18" height="3" rx="1.5" fill="#B9503A" stroke="#4A322A" stroke-width="1.6"/><path d="M8 3.4c0-1.2 1.4-1.2 1.4-2.4M12.6 3.4c0-1.2 1.4-1.2 1.4-2.4" stroke="#9AA5AE" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="stxt">加入开水炖煮半小时</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">7</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.6 3.6L8 14h5l-2.4 6.4L18 9h-5l1.6-5.4Z" fill="#F2C94C" stroke="#4A322A" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="stxt">临出锅前倒入螺旋椒即可</span></div></div>
+  </div>
+</div></body></html>

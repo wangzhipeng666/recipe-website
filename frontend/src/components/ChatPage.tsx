@@ -66,15 +66,19 @@ export function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-orange-50/50">
-      <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+    <div className="flex flex-col h-full">
+      <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="max-w-3xl mx-auto space-y-4">
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={msg.id} className={`flex items-start gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {msg.role === 'system' && (
+              <span className="shrink-0 seal w-9 h-9 text-base rotate-[-4deg]">厨</span>
+            )}
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+              className={`max-w-[85%] px-4 py-3 ${
                 msg.role === 'user'
-                  ? 'bg-orange-500 text-white rounded-br-md'
-                  : 'bg-white text-gray-700 border border-orange-100 rounded-bl-md shadow-sm'
+                  ? 'bg-accent text-[#FFF6E8] border-2 border-ink/80 rounded-2xl rounded-br-md shadow-hard-sm'
+                  : 'paper-card-tight !rounded-2xl !rounded-bl-md text-ink/90'
               }`}
             >
               {msg.type === 'recipe_preview' && msg.recipe ? (
@@ -82,20 +86,22 @@ export function ChatPage() {
               ) : msg.type === 'confirm' ? (
                 <div>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.text}</p>
-                  {msg.recipe_name && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {msg.recipe_name && (
+                      <button
+                        onClick={() => handleAction(`生成图片：${msg.recipe_name}`)}
+                        className="px-3 py-1.5 rounded-full bg-sun/30 border-2 border-sun/60 text-[#8A5A2B] text-xs active:translate-y-0.5 transition-transform"
+                      >
+                        🎨 为这道菜生成图片
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleAction(`生成图片：${msg.recipe_name}`)}
-                      className="mt-2 text-xs text-purple-500 underline"
+                      onClick={() => handleAction('继续添加')}
+                      className="px-3 py-1.5 rounded-full bg-paper border-2 border-ink/30 text-ink/80 text-xs active:translate-y-0.5 transition-transform"
                     >
-                      🎨 为这道菜生成图片
+                      继续添加其他菜谱
                     </button>
-                  )}
-                  <button
-                    onClick={() => handleAction('继续添加')}
-                    className="mt-2 ml-2 text-xs text-orange-500 underline"
-                  >
-                    继续添加其他菜谱
-                  </button>
+                  </div>
                 </div>
               ) : (
                 <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.text}</p>
@@ -104,37 +110,40 @@ export function ChatPage() {
           </div>
         ))}
         {loading && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-orange-100 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" />
-                <span className="w-2 h-2 bg-orange-300 rounded-full animate-bounce [animation-delay:0.1s]" />
-                <span className="w-2 h-2 bg-orange-300 rounded-full animate-bounce [animation-delay:0.2s]" />
+          <div className="flex items-start gap-2.5">
+            <span className="shrink-0 seal w-9 h-9 text-base rotate-[-4deg]">厨</span>
+            <div className="paper-card-tight !rounded-2xl !rounded-bl-md px-4 py-3.5">
+              <div className="flex gap-1.5">
+                <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce" />
+                <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce [animation-delay:0.12s]" />
+                <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce [animation-delay:0.24s]" />
               </div>
             </div>
           </div>
         )}
+        </div>
       </div>
 
-      <div className="border-t border-orange-100 bg-white px-4 py-3 relative z-30">
-        <div className="flex gap-2">
+      <div className="border-t-2 border-ink/12 bg-cream/95 backdrop-blur-sm px-4 py-3 relative z-30">
+        <div className="max-w-3xl mx-auto flex gap-2.5">
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
-            placeholder="输入菜名或指令..."
-            className="flex-1 px-4 py-3 rounded-xl bg-orange-50 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
+            placeholder="输入菜名，比如「红烧排骨」…"
+            className="field flex-1 !rounded-full text-[15px]"
             disabled={loading}
           />
           <button
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || loading}
-            className="shrink-0 w-11 h-11 rounded-xl bg-orange-500 text-white flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform"
+            aria-label="发送"
+            className="shrink-0 w-12 h-12 rounded-full bg-accent text-[#FFF6E8] border-2 border-ink/80 shadow-hard-sm flex items-center justify-center disabled:opacity-40 active:translate-y-0.5 active:shadow-none transition-transform"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>
         </div>
@@ -161,26 +170,20 @@ function RecipePreviewCard({
     <div>
       <p className="whitespace-pre-wrap text-sm leading-relaxed mb-3">{text}</p>
 
-      <div className="bg-orange-50/80 rounded-xl p-3 mb-3 space-y-2">
+      <div className="bg-paper/80 rounded-xl p-3 mb-3 space-y-2.5 border border-ink/12">
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="bg-white px-2 py-0.5 rounded-full border border-orange-200">
-            📂 {recipe.category}
-          </span>
+          <span className="bg-cream px-2.5 py-1 rounded-full border border-ink/25">📂 {recipe.category}</span>
           {recipe.cook_time && (
-            <span className="bg-white px-2 py-0.5 rounded-full border border-orange-200">
-              ⏱ {recipe.cook_time}
-            </span>
+            <span className="bg-cream px-2.5 py-1 rounded-full border border-ink/25">⏱ {recipe.cook_time}</span>
           )}
-          <span className="bg-white px-2 py-0.5 rounded-full border border-orange-200">
-            📊 {recipe.difficulty}
-          </span>
+          <span className="bg-cream px-2.5 py-1 rounded-full border border-ink/25">📊 {recipe.difficulty}</span>
         </div>
 
         <div>
-          <p className="text-xs font-medium text-gray-500 mb-1">🥬 食材</p>
-          <div className="flex flex-wrap gap-1">
+          <p className="text-xs font-display text-accent tracking-wider mb-1.5">🧺 食材</p>
+          <div className="flex flex-wrap gap-1.5">
             {previewIngredients.map((item, i) => (
-              <span key={i} className="text-xs bg-white px-2 py-0.5 rounded border border-orange-100">
+              <span key={i} className="text-xs bg-cream px-2 py-1 rounded-full border border-ink/20">
                 {item}
               </span>
             ))}
@@ -188,10 +191,13 @@ function RecipePreviewCard({
         </div>
 
         <div>
-          <p className="text-xs font-medium text-gray-500 mb-1">👨‍🍳 做法</p>
-          <ol className="text-xs space-y-1 list-decimal list-inside text-gray-600">
+          <p className="text-xs font-display text-accent tracking-wider mb-1.5">🍳 做法</p>
+          <ol className="text-xs space-y-1.5 text-ink/80">
             {previewSteps.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i} className="flex gap-2">
+                <span className="shrink-0 w-4.5 h-4.5 mt-0.5 rounded-full bg-sun/70 border border-ink/50 text-[10px] flex items-center justify-center">{i + 1}</span>
+                {step}
+              </li>
             ))}
           </ol>
         </div>
@@ -199,33 +205,33 @@ function RecipePreviewCard({
         {(recipe.ingredients.length > 5 || recipe.steps.length > 3) && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-xs text-orange-500 underline"
+            className="text-xs text-accent underline underline-offset-2"
           >
             {expanded ? '收起' : '展开全部'}
           </button>
         )}
 
         {recipe.tips && (
-          <p className="text-xs text-yellow-600 bg-yellow-50 p-2 rounded-lg">💡 {recipe.tips}</p>
+          <p className="text-xs text-[#8A5A2B] bg-sun/25 border border-dashed border-accent/40 p-2 rounded-lg">💡 {recipe.tips}</p>
         )}
       </div>
 
       <div className="flex gap-2">
         <button
           onClick={() => onAction('确认')}
-          className="flex-1 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-medium active:scale-95 transition-transform min-h-[40px]"
+          className="flex-1 py-2.5 rounded-xl bg-accent text-[#FFF6E8] border-2 border-ink/80 text-sm font-display tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-transform min-h-[40px]"
         >
           ✅ 确认添加
         </button>
         <button
           onClick={() => onAction('修改')}
-          className="px-3 py-2.5 rounded-xl bg-white border border-orange-200 text-orange-600 text-sm active:scale-95 transition-transform min-h-[40px]"
+          className="px-3.5 py-2.5 rounded-xl bg-cream border-2 border-ink/60 text-ink text-sm font-display tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-transform min-h-[40px]"
         >
           ✏️ 修改
         </button>
         <button
           onClick={() => onAction('放弃')}
-          className="px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-500 text-sm active:scale-95 transition-transform min-h-[40px]"
+          className="px-3.5 py-2.5 rounded-xl bg-cream border-2 border-ink/25 text-ink-soft text-sm shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-transform min-h-[40px]"
         >
           放弃
         </button>

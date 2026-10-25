@@ -49,7 +49,7 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
 
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
-  const [touchStartY, setTouchStartY] = useState<number | null>(null)
+
   const [isDragging, setIsDragging] = useState(false)
 
   const handleDragStart = (i: number) => setDragIndex(i)
@@ -66,8 +66,7 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
     setDragOverIndex(null)
   }
 
-  const handleTouchStart = (i: number, e: React.TouchEvent) => {
-    setTouchStartY(e.touches[0].clientY)
+  const handleTouchStart = (i: number) => {
     setDragIndex(i)
     setIsDragging(false)
   }
@@ -96,7 +95,7 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
     }
     setDragIndex(null)
     setDragOverIndex(null)
-    setTouchStartY(null)
+
     setIsDragging(false)
   }
 
@@ -191,54 +190,94 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      <div className="sticky top-0 bg-white border-b border-orange-100 px-4 py-3 flex items-center justify-between z-10">
-        <button onClick={onCancel} className="text-gray-500">取消</button>
-        <h1 className="font-semibold text-gray-800">{initial ? '编辑菜谱' : '添加菜谱'}</h1>
-        <button onClick={handleSubmit} disabled={loading} className="text-orange-500 font-medium disabled:opacity-50">
-          {loading ? '保存中...' : '保存'}
+    <div className="min-h-screen pb-20 md:pb-12">
+      <div className="sticky top-0 md:top-16 bg-cream/95 backdrop-blur-sm border-b-2 border-ink/12 px-4 py-3 flex items-center justify-between z-20">
+        <button onClick={onCancel} className="btn-ghost !py-2 text-sm">取消</button>
+        <h1 className="font-display text-xl tracking-widest">{initial ? '编辑菜谱' : '添加菜谱'}</h1>
+        <button onClick={handleSubmit} disabled={loading} className="btn-primary !py-2 text-sm">
+          {loading ? '保存中…' : '💾 保存'}
         </button>
       </div>
 
-      <div className="p-4 space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">菜名 *</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="例如：红烧肉"
-            className="w-full px-4 py-3 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
-          />
+      <div className="max-w-2xl mx-auto p-4 md:px-0 md:pt-6 space-y-4">
+        <div className="paper-card p-4 space-y-4">
+          <div>
+            <label className="block text-sm font-display tracking-wider mb-1.5">菜名 *</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="例如：红烧肉"
+              className="field"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-display tracking-wider mb-1.5">分类</label>
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(Number(e.target.value))}
+                className="field"
+              >
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-display tracking-wider mb-1.5">难度</label>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+                className="field"
+              >
+                <option>简单</option>
+                <option>中等</option>
+                <option>较难</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-display tracking-wider mb-1.5">烹饪时间</label>
+            <input
+              type="text"
+              value={cookTime}
+              onChange={(e) => setCookTime(e.target.value)}
+              placeholder="例如：30分钟"
+              className="field"
+            />
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">图片</label>
+        <div className="paper-card p-4">
+          <label className="block text-sm font-display tracking-wider mb-2.5">图片</label>
           <div className="flex flex-col sm:flex-row gap-2">
-            <label className="flex-1 px-4 py-3 rounded-xl border border-dashed border-orange-300 text-center text-orange-500 cursor-pointer active:bg-orange-50 min-h-[48px] flex items-center justify-center">
-              {loading ? '上传中...' : '📷 上传图片'}
+            <label className="flex-1 px-4 py-3 rounded-xl border-2 border-dashed border-accent/45 bg-paper/60 text-accent text-center cursor-pointer active:translate-y-0.5 transition-transform min-h-[48px] flex items-center justify-center">
+              {loading ? '上传中…' : '📷 上传图片'}
               <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
             </label>
             <button
               type="button"
               onClick={handleGenerate}
               disabled={generating}
-              className="px-4 py-3 rounded-xl bg-purple-50 text-purple-600 border border-purple-200 active:bg-purple-100 disabled:opacity-50 min-h-[48px]"
+              className="px-4 py-3 rounded-xl bg-sun/25 text-[#8A5A2B] border-2 border-sun/60 font-display tracking-wider active:translate-y-0.5 transition-transform disabled:opacity-50 min-h-[48px]"
             >
-              {generating ? '生成中...' : '🎨 AI生成'}
+              {generating ? '生成中…' : '🎨 AI 生成'}
             </button>
           </div>
           {images.length > 0 && (
-            <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-3 gap-2">
               {images.map((url, i) => (
                 <div key={i} className="relative group cursor-pointer" onClick={() => handleSetMainImage(i)}>
-                  <img src={url} alt={`图片${i + 1}`} className={`w-full h-24 object-contain rounded-xl bg-orange-50 ${i === 0 ? 'ring-2 ring-orange-500' : ''}`} />
-                  <span className={`absolute top-1 left-1 text-[10px] px-1.5 py-0.5 rounded-full ${i === 0 ? 'bg-orange-500 text-white' : 'bg-black/40 text-white opacity-0 group-hover:opacity-100'}`}>
+                  <img src={url} alt={`图片${i + 1}`} className={`w-full h-24 object-cover rounded-xl border-2 bg-paper ${i === 0 ? 'border-accent' : 'border-ink/25'}`} />
+                  <span className={`absolute top-1 left-1 text-[10px] px-1.5 py-0.5 rounded-full font-display ${i === 0 ? 'bg-accent text-[#FFF6E8]' : 'bg-ink/45 text-cream opacity-0 group-hover:opacity-100'}`}>
                     {i === 0 ? '主图' : '设为主图'}
                   </span>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleRemoveImage(i) }}
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white text-xs flex items-center justify-center"
+                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-ink/55 text-cream text-xs flex items-center justify-center"
                   >
                     ×
                   </button>
@@ -247,53 +286,15 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
             </div>
           )}
           {generateProgress && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-purple-600">
-              <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+            <div className="mt-2.5 flex items-center gap-2 text-sm text-[#8A5A2B]">
+              <div className="w-4 h-4 border-2 border-sun border-t-transparent rounded-full animate-spin" />
               {generateProgress}
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">分类</label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(Number(e.target.value))}
-              className="w-full px-4 py-3 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
-            >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">难度</label>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
-            >
-              <option>简单</option>
-              <option>中等</option>
-              <option>较难</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">烹饪时间</label>
-          <input
-            type="text"
-            value={cookTime}
-            onChange={(e) => setCookTime(e.target.value)}
-            placeholder="例如：30分钟"
-            className="w-full px-4 py-3 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">食材</label>
+        <div className="paper-card p-4">
+          <label className="block text-sm font-display tracking-wider mb-2.5">🧺 食材</label>
           <div className="space-y-2">
             {ingredients.map((item, i) => (
               <div key={i} className="flex gap-2">
@@ -302,23 +303,23 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
                   value={item}
                   onChange={(e) => handleIngredientChange(i, e.target.value)}
                   placeholder={`食材 ${i + 1}`}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
+                  className="field flex-1 !py-2.5 text-sm"
                 />
                 {ingredients.length > 1 && (
-                  <button onClick={() => handleRemoveIngredient(i)} className="text-gray-400 active:text-red-500 px-2 min-w-[36px] min-h-[36px] flex items-center justify-center">
+                  <button onClick={() => handleRemoveIngredient(i)} className="text-ink-soft active:text-accent px-2 min-w-[36px] min-h-[36px] flex items-center justify-center">
                     ×
                   </button>
                 )}
               </div>
             ))}
           </div>
-          <button onClick={handleAddIngredient} className="mt-2 text-sm text-orange-500 hover:text-orange-600">
-            + 添加食材
+          <button onClick={handleAddIngredient} className="mt-2.5 text-sm font-display tracking-wider text-accent">
+            ✚ 添加食材
           </button>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">做法步骤</label>
+        <div className="paper-card p-4">
+          <label className="block text-sm font-display tracking-wider mb-2.5">🍳 做法步骤</label>
           <div className="space-y-2">
             {steps.map((step, i) => (
               <div
@@ -330,19 +331,19 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
                 onDragEnd={handleDragEnd}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop(i)}
-                onTouchStart={(e) => handleTouchStart(i, e)}
+                onTouchStart={() => handleTouchStart(i)}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                className={`flex gap-2 rounded-xl transition-all touch-none select-none ${dragIndex === i ? 'opacity-40 scale-[0.98]' : ''} ${dragOverIndex === i ? 'ring-2 ring-orange-400 ring-offset-1' : ''}`}
+                className={`flex gap-2 rounded-xl transition-all touch-none select-none ${dragIndex === i ? 'opacity-40 scale-[0.98]' : ''} ${dragOverIndex === i ? 'ring-2 ring-accent/60 ring-offset-1' : ''}`}
               >
-                <div className="shrink-0 flex flex-col items-center gap-0.5 mt-1.5 cursor-grab active:cursor-grabbing text-gray-300 hover:text-orange-400 transition-colors" title="拖拽排序">
+                <div className="shrink-0 flex flex-col items-center gap-0.5 mt-1.5 cursor-grab active:cursor-grabbing text-ink/25 hover:text-accent transition-colors" title="拖拽排序">
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                     <circle cx="5" cy="3" r="1.5"/><circle cx="11" cy="3" r="1.5"/>
                     <circle cx="5" cy="8" r="1.5"/><circle cx="11" cy="8" r="1.5"/>
                     <circle cx="5" cy="13" r="1.5"/><circle cx="11" cy="13" r="1.5"/>
                   </svg>
                 </div>
-                <span className="shrink-0 w-7 h-7 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-medium mt-1.5">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-sun border-2 border-ink/70 text-ink flex items-center justify-center text-xs font-display mt-1.5">
                   {i + 1}
                 </span>
                 <textarea
@@ -350,29 +351,29 @@ export function RecipeForm({ categories, initial, onSave, onCancel }: Props) {
                   onChange={(e) => handleStepChange(i, e.target.value)}
                   placeholder={`步骤 ${i + 1}`}
                   rows={2}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm resize-none"
+                  className="field flex-1 !py-2.5 text-sm resize-none"
                 />
                 {steps.length > 1 && (
-                  <button onClick={() => handleRemoveStep(i)} className="text-gray-400 active:text-red-500 px-2 self-start mt-2 min-w-[36px] min-h-[36px] flex items-center justify-center">
+                  <button onClick={() => handleRemoveStep(i)} className="text-ink-soft active:text-accent px-2 self-start mt-2 min-w-[36px] min-h-[36px] flex items-center justify-center">
                     ×
                   </button>
                 )}
               </div>
             ))}
           </div>
-          <button onClick={handleAddStep} className="mt-2 text-sm text-orange-500 hover:text-orange-600">
-            + 添加步骤
+          <button onClick={handleAddStep} className="mt-2.5 text-sm font-display tracking-wider text-accent">
+            ✚ 添加步骤
           </button>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">小贴士</label>
+        <div className="paper-card p-4">
+          <label className="block text-sm font-display tracking-wider mb-1.5">💡 小贴士</label>
           <textarea
             value={tips}
             onChange={(e) => setTips(e.target.value)}
-            placeholder="可选：烹饪小技巧..."
+            placeholder="可选：烹饪小技巧…"
             rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm resize-none"
+            className="field text-sm resize-none"
           />
         </div>
       </div>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../fonts_local.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1024px; height:768px; overflow:hidden;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255,255,255,.5) 0 26px, transparent 27px),
+      radial-gradient(circle at 85% 85%, rgba(255,255,255,.4) 0 34px, transparent 35px),
+      radial-gradient(rgba(210,190,150,.38) 1.2px, transparent 1.3px),
+      radial-gradient(rgba(210,190,150,.28) 1.2px, transparent 1.3px),
+      #FAF2E0;
+    background-size: auto, auto, 26px 26px, 34px 34px, auto;
+    background-position: 0 0, 0 0, 0 0, 13px 17px, 0 0; }
+  .card { position:relative; width:1024px; height:768px; padding:22px 26px;
+    font-family:"ZCOOL KuaiLe","Hiragino Sans GB",sans-serif; color:#4A322A;
+    display:flex; flex-direction:column; }
+  .frame { position:absolute; inset:12px; border:2.5px dashed rgba(200,69,44,.42);
+    border-radius:22px; pointer-events:none; }
+  .topzone { display:flex; gap:20px; align-items:stretch; }
+  .leftzone { flex:1; min-width:0; display:flex; flex-direction:column; gap:12px; }
+  .rightzone { width:312px; flex:none; display:flex; flex-direction:column; gap:14px;
+    align-items:center; }
+  .head { display:flex; align-items:center; gap:16px; }
+  .titleblock { flex:1; min-width:0; }
+  h1 { font-size:54px; line-height:1.05; letter-spacing:3px; font-weight:400; }
+  .sub { display:flex; gap:10px; align-items:center; margin-top:8px; }
+  .chip { display:flex; align-items:center; gap:5px; padding:3px 12px; border-radius:999px;
+    font-size:16px; border:2px solid rgba(74,50,42,.35); background:rgba(255,251,240,.8); }
+  .chip.hot { border-color:#C8452C; color:#C8452C; }
+  .hero { position:relative; width:312px; flex:none; }
+  .blob { position:absolute; inset:-15px; z-index:0; }
+  .blob i { position:absolute; border-radius:50%; filter:blur(15px); }
+  .heroframe { position:relative; z-index:1; background:#FFFBF0; border:3px solid #4A322A;
+    border-radius:16px; padding:7px; box-shadow:3px 4px 0 rgba(74,50,42,.18);
+    transform:rotate(.9deg); overflow:hidden; }
+  .heroframe svg { width:100%; height:auto; display:block; }
+  .tape { position:absolute; z-index:3; width:92px; height:24px; background:rgba(245,196,69,.72);
+    border:1.5px dashed rgba(74,50,42,.4); top:-11px; left:20px; transform:rotate(-5deg); }
+  .seal { position:absolute; z-index:3; right:-12px; bottom:-12px; width:74px; height:74px;
+    border-radius:13px; background:#C8452C; color:#FFF6E8; display:flex; align-items:center;
+    justify-content:center; font-size:40px; transform:rotate(-6deg);
+    box-shadow:2px 3px 0 rgba(74,50,42,.25);
+    outline:2px solid rgba(200,69,44,.35); outline-offset:3px; }
+  .tipnote { position:relative; z-index:1; width:100%; background:rgba(245,196,69,.32);
+    border:2px dashed rgba(200,69,44,.5); border-radius:12px; padding:8px 12px 10px;
+    transform:rotate(-.7deg); }
+  .tiphead { font-size:16px; color:#C8452C; margin-bottom:2px; }
+  .tipbody { font-family:"Ma Shan Zheng","ZCOOL KuaiLe",serif; font-size:16px;
+    line-height:1.36; color:#8A5A2B; }
+  .sec { background:rgba(255,251,240,.86); border:2.5px solid rgba(74,50,42,.85);
+    border-radius:16px; padding:10px 14px 12px; position:relative; overflow:hidden;
+    flex:none; }
+  .sec.stepsec { flex:1 1 0; min-height:0; display:flex; flex-direction:column;
+    margin-top:12px; }
+  .sectitle { display:flex; align-items:center; gap:9px; font-size:24px; color:#C8452C;
+    margin-bottom:8px; }
+  .sectitle .line { flex:1; height:3px; border-radius:2px;
+    background:repeating-linear-gradient(90deg, rgba(200,69,44,.4) 0 12px, transparent 12px 18px); }
+  .ings { display:flex; flex-wrap:wrap; gap:6px 8px; }
+  .ing { display:flex; align-items:center; gap:5px; padding:3px 10px 3px 6px;
+    background:#FFF; border:1.8px solid rgba(74,50,42,.8); border-radius:999px;
+    font-size:14px; white-space:nowrap; }
+  .ing svg { width:20px; height:20px; flex:none; }
+  .ing span { min-width:0; }
+  .steps { display:flex; flex-direction:column; gap:7px; }
+  .step { display:flex; align-items:flex-start; gap:10px; min-height:0; }
+  .step svg { width:24px; height:24px; flex:none; margin-top:3px; }
+  .badge { flex:none; border-radius:50%; background:#F5C445; border:2.5px solid #4A322A;
+    color:#4A322A; display:flex; align-items:center; justify-content:center; font-size:18px; margin-top:2px; }
+  .stxt { font-size:15px; line-height:1.34; padding-top:4px; min-width:0; }
+  .step.many .stxt { font-size:14px; line-height:1.3; padding-top:3px; }
+  .step.lots .stxt { font-size:13px; line-height:1.26; padding-top:3px; }
+  .step.tiny .stxt { font-size:12px; line-height:1.22; padding-top:2px; }
+  .step.tiny svg { width:19px; height:19px; margin-top:2px; }
+  .step.tiny { gap:7px; }
+  .step.lots svg { width:21px; height:21px; margin-top:2px; }
+  .step.lots { gap:8px; }
+  .steps.tight { gap:5px; }
+  .stepsec .steps { flex:1; justify-content:space-between; }
+  .ing span{font-size:14.0px}
+</style></head>
+<body><div class="card">
+  <div class="frame"></div>
+  <div style="position:absolute;left:30px;top:122px;width:16px;height:16px;opacity:0.85;transform:rotate(-10deg)"><svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21C5 15 2 11 2 7.3 2 4.4 4.4 2 7.3 2 9.2 2 11 3 12 4.6 13 3 14.8 2 16.7 2 19.6 2 22 4.4 22 7.3c0 3.7-3 7.7-10 13.7Z" fill="#E8763A"/></svg></div><div style="position:absolute;left:981px;top:330px;width:13px;height:13px;opacity:0.7;transform:rotate(7deg)"><svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21C5 15 2 11 2 7.3 2 4.4 4.4 2 7.3 2 9.2 2 11 3 12 4.6 13 3 14.8 2 16.7 2 19.6 2 22 4.4 22 7.3c0 3.7-3 7.7-10 13.7Z" fill="#E8763A"/></svg></div><div style="position:absolute;left:935px;top:742px;width:14px;height:14px;opacity:0.8;transform:rotate(5deg)"><svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21C5 15 2 11 2 7.3 2 4.4 4.4 2 7.3 2 9.2 2 11 3 12 4.6 13 3 14.8 2 16.7 2 19.6 2 22 4.4 22 7.3c0 3.7-3 7.7-10 13.7Z" fill="#F2A9A0"/></svg></div>
+  <div style="position:absolute;left:34px;top:300px;width:14px;height:14px;opacity:0.9"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#F2C94C"/></svg></div><div style="position:absolute;left:986px;top:560px;width:12px;height:12px;opacity:0.9"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#F2C94C"/></svg></div><div style="position:absolute;left:300px;top:748px;width:11px;height:11px;opacity:0.75"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#E8763A"/></svg></div><div style="position:absolute;left:680px;top:26px;width:12px;height:12px;opacity:0.9"><svg viewBox="-1.2 -1.2 2.4 2.4" width="100%" height="100%"><path d="M0 -1 Q 0.22 -0.22 1 0 Q 0.22 0.22 0 1 Q -0.22 0.22 -1 0 Q -0.22 -0.22 0 -1 Z" fill="#F2C94C"/></svg></div>
+  <div class="topzone">
+    <div class="leftzone">
+      <div class="head">
+        <svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><ellipse cx="48" cy="88" rx="30" ry="6" fill="#8A5A33" opacity=".18"/><ellipse cx="48" cy="52" rx="26" ry="31" fill="#FFE08A" stroke="#4A322A" stroke-width="3" stroke-linejoin="round" transform="rotate(-10 48 52)"/><path d="M32 34q8-8 16-4" stroke="#FFF6D8" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="39.0" cy="54" r="2.2" fill="#4A322A"/><circle cx="57.0" cy="54" r="2.2" fill="#4A322A"/><circle cx="36.8" cy="50.8" r="1.4" fill="#fff" opacity=".9"/><circle cx="54.8" cy="50.8" r="1.4" fill="#fff" opacity=".9"/><circle cx="33.0" cy="61.0" r="3.4" fill="#F2A9A0" opacity=".85"/><circle cx="63.0" cy="61.0" r="3.4" fill="#F2A9A0" opacity=".85"/><path d="M 44.0 59.0 q 4.0 3.4 8.0 0" fill="none" stroke="#4A322A" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div class="titleblock">
+          <h1>紫菜蛋花汤</h1>
+          <div class="sub">
+            <div class="chip hot">★ 简单</div>
+            <div class="chip">⏱ 5分钟</div>
+            <div class="chip" style="color:#7BA05B">汤羹</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sectitle">🧺 食材准备<div class="line"></div></div>
+        <div class="ings"><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21c-6-3-8-8-6-14 2 0 4 1 5 3 0-3 1-6 4-7 1 5 3 14-3 18Z" fill="#7BA05B" stroke="#4A322A" stroke-width="1.6"/></svg><span>紫菜适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="12" cy="12" rx="7.5" ry="9" fill="#FFE08A" stroke="#4A322A" stroke-width="1.6" transform="rotate(-14 12 12)"/><path d="M8.5 8.5q2-2 4-1" stroke="#FFF6D8" stroke-width="2" stroke-linecap="round" fill="none"/></svg><span>鸡蛋1个</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19c1-4 3-6 6-6s5 2 6 6H6Z" fill="#FFFFFF" stroke="#4A322A" stroke-width="1.6"/></svg><span>盐适量</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3c3 4.6 6 7.8 6 11a6 6 0 0 1-12 0c0-3.2 3-6.4 6-11Z" fill="#F2B84B" stroke="#4A322A" stroke-width="1.6"/><circle cx="10" cy="15" r="1.8" fill="#FFE9B0"/></svg><span>香油少许</span></div><div class="ing"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" fill="#8FCB6E" stroke="#4A322A" stroke-width="1.6"/><circle cx="12" cy="12" r="3.4" fill="#F2FFE3"/></svg><span>葱花适量</span></div></div>
+      </div>
+    </div>
+    <div class="rightzone">
+      <div class="hero">
+        <div class="blob">
+          <i style="left:2%;top:14%;width:180px;height:115px;background:#F5C445;opacity:.5"></i>
+          <i style="right:0%;bottom:16%;width:200px;height:130px;background:#F2A9A0;opacity:.42"></i>
+          <i style="left:24%;top:60%;width:150px;height:95px;background:#9FC98A;opacity:.4"></i>
+        </div>
+        <div class="heroframe"><svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768">
+<defs>
+  <radialGradient id="bgsoup" cx="50%" cy="38%" r="80%">
+    <stop offset="0%" stop-color="#FFF8E9"/>
+    <stop offset="55%" stop-color="#FFEAC8"/>
+    <stop offset="100%" stop-color="#FFDCA8"/>
+  </radialGradient>
+  <linearGradient id="woodsoup" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#DCA768"/>
+    <stop offset="100%" stop-color="#C58E4E"/>
+  </linearGradient>
+</defs>
+<rect width="1024" height="768" fill="url(#bgsoup)"/>
+<circle cx="90" cy="120" r="46" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="930" cy="90" r="34" fill="#FFFFFF" opacity="0.45"/>
+<circle cx="860" cy="240" r="22" fill="#FFFFFF" opacity="0.4"/>
+<circle cx="150" cy="300" r="18" fill="#FFFFFF" opacity="0.35"/>
+<circle cx="760" cy="60" r="16" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="60" cy="430" r="26" fill="#FFFFFF" opacity="0.3"/>
+<circle cx="980" cy="380" r="30" fill="#FFFFFF" opacity="0.3"/>
+<circle cx="250" cy="60" r="20" fill="#FFFFFF" opacity="0.4"/>
+<rect x="-20" y="618" width="1064" height="170" rx="26" fill="url(#woodsoup)" stroke="#4A322A" stroke-width="5"/>
+<line x1="120" y1="668" x2="920" y2="668" stroke="#B47E42" stroke-width="3" opacity="0.5"/>
+<line x1="260" y1="708" x2="800" y2="708" stroke="#B47E42" stroke-width="3" opacity="0.35"/>
+<ellipse cx="512" cy="556" rx="216.0" ry="26" fill="#8A5A33" opacity="0.3"/>
+<path d="M 272 420 C 272 512.16 363.2 548 512 548 C 660.8 548 752 512.16 752 420 Z" fill="#4E77B5" stroke="#4A322A" stroke-width="6"/><ellipse cx="512" cy="558" rx="100.8" ry="14" fill="#4E77B5" stroke="#4A322A" stroke-width="5"/><path d="M 305.6 486.56 C 344.0 445.6 344.0 445.6 368.0 443.04" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+<defs><radialGradient id="grad_soup" cx="50%" cy="40%" r="70%">
+        <stop offset="0%" stop-color="#F3CF6B"/><stop offset="100%" stop-color="#E0AE45"/>
+        </radialGradient></defs>
+        <ellipse cx="512" cy="418" rx="226" ry="80" fill="url(#grad_soup)" stroke="#4A322A" stroke-width="6"/>
+<g transform="translate(352 406) rotate(-12) scale(1.1)"><path d="M -42 6 Q -30 -22 -6 -14 Q 4 -30 22 -16 Q 44 -22 40 4 Q 50 16 28 20 Q 4 30 -18 22 Q -44 24 -42 6 Z" fill="#3F6B4F" stroke="#4A322A" stroke-width="4"/><path d="M -28 4 Q -6 -6 24 6" fill="none" stroke="#597F52" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(482 390) rotate(8) scale(0.9)"><path d="M -42 6 Q -30 -22 -6 -14 Q 4 -30 22 -16 Q 44 -22 40 4 Q 50 16 28 20 Q 4 30 -18 22 Q -44 24 -42 6 Z" fill="#3F6B4F" stroke="#4A322A" stroke-width="4"/><path d="M -28 4 Q -6 -6 24 6" fill="none" stroke="#597F52" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(607 402) rotate(-6) scale(1.2)"><path d="M -42 6 Q -30 -22 -6 -14 Q 4 -30 22 -16 Q 44 -22 40 4 Q 50 16 28 20 Q 4 30 -18 22 Q -44 24 -42 6 Z" fill="#3F6B4F" stroke="#4A322A" stroke-width="4"/><path d="M -28 4 Q -6 -6 24 6" fill="none" stroke="#597F52" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(687 428) rotate(14) scale(0.8)"><path d="M -42 6 Q -30 -22 -6 -14 Q 4 -30 22 -16 Q 44 -22 40 4 Q 50 16 28 20 Q 4 30 -18 22 Q -44 24 -42 6 Z" fill="#3F6B4F" stroke="#4A322A" stroke-width="4"/><path d="M -28 4 Q -6 -6 24 6" fill="none" stroke="#597F52" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(422 450) rotate(5) scale(0.85)"><path d="M -42 6 Q -30 -22 -6 -14 Q 4 -30 22 -16 Q 44 -22 40 4 Q 50 16 28 20 Q 4 30 -18 22 Q -44 24 -42 6 Z" fill="#3F6B4F" stroke="#4A322A" stroke-width="4"/><path d="M -28 4 Q -6 -6 24 6" fill="none" stroke="#597F52" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(402 438) rotate(-8)"><path d="M -50 0 Q -30 -16 -6 -4 Q 20 8 50 -6" fill="none" stroke="#FFE08A" stroke-width="14" stroke-linecap="round"/><path d="M -50 0 Q -30 -16 -6 -4 Q 20 8 50 -6" fill="none" stroke="#4A322A" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/></g>
+<g transform="translate(522 428) rotate(10)"><path d="M -50 0 Q -30 -16 -6 -4 Q 20 8 50 -6" fill="none" stroke="#FFE08A" stroke-width="14" stroke-linecap="round"/><path d="M -50 0 Q -30 -16 -6 -4 Q 20 8 50 -6" fill="none" stroke="#4A322A" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/></g>
+<g transform="translate(642 450) rotate(-5)"><path d="M -50 0 Q -30 -16 -6 -4 Q 20 8 50 -6" fill="none" stroke="#FFE08A" stroke-width="14" stroke-linecap="round"/><path d="M -50 0 Q -30 -16 -6 -4 Q 20 8 50 -6" fill="none" stroke="#4A322A" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/></g>
+<circle cx="322" cy="402" r="4.5" fill="#FFFDF4"/>
+<circle cx="572" cy="386" r="4.5" fill="#FFFDF4"/>
+<circle cx="697" cy="398" r="4.5" fill="#FFFDF4"/>
+<path d="M 272 420 A 240 88 0 0 0 752 420" fill="none" stroke="#FFFFFF" stroke-width="13"/> <path d="M 272 420 A 240 88 0 0 0 752 420" fill="none" stroke="#4A322A" stroke-width="6"/>
+<ellipse cx="840" cy="600" rx="74" ry="13" fill="#8A5A33" opacity="0.3"/>
+<g transform="translate(860 574) rotate(6)"><path d="M 44 4 Q 88 10 104 26" fill="none" stroke="#4A322A" stroke-width="5" stroke-linecap="round"/><path d="M 44 4 Q 88 10 104 26" fill="none" stroke="#FDFBF6" stroke-width="11" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="52" ry="34" fill="#FDFBF6" stroke="#4A322A" stroke-width="5"/><ellipse cx="-2" cy="-2" rx="38" ry="22" fill="#F7EBD3" stroke="#4A322A" stroke-width="3"/></g>
+<path d="M 512 304 c -24.7 -21.599999999999998 24.7 -38.4 0 -60.0 c -24.7 -21.599999999999998 24.7 -38.4 0 -108.0" fill="none" stroke="#FFFFFF" stroke-width="10.45" stroke-linecap="round" opacity="0.72"/>
+<path d="M 567.1 317.3 c -24.7 -21.599999999999998 24.7 -38.4 0 -60.0 c -24.7 -21.599999999999998 24.7 -38.4 0 -108.0" fill="none" stroke="#FFFFFF" stroke-width="10.45" stroke-linecap="round" opacity="0.72"/>
+<path d="M 456.9 317.3 c -24.7 -21.599999999999998 24.7 -38.4 0 -60.0 c -24.7 -21.599999999999998 24.7 -38.4 0 -108.0" fill="none" stroke="#FFFFFF" stroke-width="10.45" stroke-linecap="round" opacity="0.72"/>
+<path d="M 120 144 Q 125.72 164.28 146 170 Q 125.72 175.72 120 196 Q 114.28 175.72 94 170 Q 114.28 164.28 120 144 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 158 115 Q 160.86 125.14 171 128 Q 160.86 130.86 158 141 Q 155.14 130.86 145 128 Q 155.14 125.14 158 115 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 900 178 Q 904.84 195.16 922 200 Q 904.84 204.84 900 222 Q 895.16 204.84 878 200 Q 895.16 195.16 900 178 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 938 151 Q 940.42 159.58 949 162 Q 940.42 164.42 938 173 Q 935.58 164.42 927 162 Q 935.58 159.58 938 151 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 830 78 Q 832.64 87.36 842 90 Q 832.64 92.64 830 102 Q 827.36 92.64 818 90 Q 827.36 87.36 830 78 Z" fill="#FFC94D" opacity="0.95"/>
+<path d="M 210 470 Q 212.2 477.8 220 480 Q 212.2 482.2 210 490 Q 207.8 482.2 200 480 Q 207.8 477.8 210 470 Z" fill="#FFC94D" opacity="0.95"/>
+</svg></div>
+        <div class="tape"></div>
+        <div class="seal">紫</div>
+      </div>
+      <div class="tipnote"><div class="tiphead">✦ 小贴士</div><div class="tipbody">蛋液要沿着锅边慢慢倒入，蛋花更漂亮</div></div>
+    </div>
+  </div>
+  <div class="sec stepsec">
+    <div class="sectitle">🍳 做法步骤<div class="line"></div></div>
+    <div class="steps"><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">1</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 8h14l-1.4 11a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 8Z" fill="#CFE3F0" stroke="#4A322A" stroke-width="1.6"/><path d="M5 8c1.4 2 3 0 4.4 1.6S12 12 13.6 10 16 8 19 8" stroke="#9FC2D8" stroke-width="1.5" fill="none"/></svg><span class="stxt">鸡蛋打散备用</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">2</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 9h16v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9Z" fill="#D96C4F" stroke="#4A322A" stroke-width="1.6"/><rect x="3" y="7" width="18" height="3" rx="1.5" fill="#B9503A" stroke="#4A322A" stroke-width="1.6"/><path d="M8 3.4c0-1.2 1.4-1.2 1.4-2.4M12.6 3.4c0-1.2 1.4-1.2 1.4-2.4" stroke="#9AA5AE" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="stxt">锅中加水煮沸</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">3</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.6 3.6L8 14h5l-2.4 6.4L18 9h-5l1.6-5.4Z" fill="#F2C94C" stroke="#4A322A" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="stxt">放入紫菜搅散</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">4</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.6 3.6L8 14h5l-2.4 6.4L18 9h-5l1.6-5.4Z" fill="#F2C94C" stroke="#4A322A" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="stxt">淋入蛋液，待蛋花飘起后关火</span></div><div class="step "><div class="badge" style="width:34px;height:34px;font-size:18.700000000000003px">5</div><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.6 3.6L8 14h5l-2.4 6.4L18 9h-5l1.6-5.4Z" fill="#F2C94C" stroke="#4A322A" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="stxt">加盐调味，淋入香油，撒葱花</span></div></div>
+  </div>
+</div></body></html>

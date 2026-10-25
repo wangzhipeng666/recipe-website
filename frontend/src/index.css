@@ -1,12 +1,45 @@
+@import url('/fonts.css');
 @import "tailwindcss";
+
+@theme {
+  --color-paper: #FAF2E0;
+  --color-cream: #FFFBF0;
+  --color-ink: #4A322A;
+  --color-accent: #C8452C;
+  --color-sun: #F5C445;
+  --color-leaf: #7BA05B;
+  --color-wood: #C58E4E;
+  --color-ink-soft: #8A6A55;
+
+  --font-display: "ZCOOL KuaiLe", "Hiragino Sans GB", "PingFang SC", sans-serif;
+  --font-hand: "Ma Shan Zheng", "ZCOOL KuaiLe", "PingFang SC", serif;
+  --font-body: "PingFang SC", -apple-system, BlinkMacSystemFont, "Hiragino Sans GB", "Segoe UI", sans-serif;
+
+  --shadow-hard: 3px 4px 0 rgba(74, 50, 42, 0.16);
+  --shadow-hard-lg: 5px 7px 0 rgba(74, 50, 42, 0.18);
+  --shadow-hard-sm: 2px 3px 0 rgba(74, 50, 42, 0.14);
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-body);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #faf7f2;
   -webkit-tap-highlight-color: transparent;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.55) 0 90px, transparent 91px),
+    radial-gradient(circle at 92% 90%, rgba(255, 255, 255, 0.45) 0 120px, transparent 121px),
+    radial-gradient(rgba(205, 185, 145, 0.35) 1.1px, transparent 1.2px),
+    radial-gradient(rgba(205, 185, 145, 0.26) 1.1px, transparent 1.2px);
+  background-size: auto, auto, 28px 28px, 36px 36px;
+  background-position: 0 0, 0 0, 0 0, 14px 19px;
+  background-attachment: fixed;
 }
 
 #root {
@@ -15,10 +48,165 @@ body {
   flex-direction: column;
 }
 
+/* 纸片卡片：奶白底 + 深棕描边 + 硬阴影 */
+.paper-card {
+  background: var(--color-cream);
+  border: 2px solid rgba(74, 50, 42, 0.82);
+  border-radius: 18px;
+  box-shadow: var(--shadow-hard);
+}
+
+.paper-card-tight {
+  background: var(--color-cream);
+  border: 2px solid rgba(74, 50, 42, 0.82);
+  border-radius: 14px;
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/* 虚线纸片（区块内衬） */
+.paper-dashed {
+  background: rgba(255, 251, 240, 0.9);
+  border: 2px dashed rgba(200, 69, 44, 0.42);
+  border-radius: 14px;
+}
+
+/* 胶带贴纸 */
+.tape {
+  position: absolute;
+  width: 88px;
+  height: 24px;
+  background: rgba(245, 196, 69, 0.72);
+  border: 1.5px dashed rgba(74, 50, 42, 0.38);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* 印章 */
+.seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #FFF6E8;
+  border-radius: 12px;
+  box-shadow: 2px 3px 0 rgba(74, 50, 42, 0.22);
+  outline: 2px solid rgba(200, 69, 44, 0.32);
+  outline-offset: 3px;
+  font-family: var(--font-display);
+}
+
+/* ---- 动画 ---- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.45s cubic-bezier(0.22, 0.9, 0.36, 1) both;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.animate-pop {
+  animation: pop 0.35s ease-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(210, 190, 150, 0.18) 25%, rgba(210, 190, 150, 0.38) 37%, rgba(210, 190, 150, 0.18) 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* 输入控件 */
+.field {
+  width: 100%;
+  background: var(--color-cream);
+  border: 2px solid rgba(74, 50, 42, 0.22);
+  border-radius: 14px;
+  padding: 11px 14px;
+  color: var(--color-ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field::placeholder {
+  color: rgba(138, 106, 85, 0.55);
+}
+.field:focus {
+  border-color: rgba(200, 69, 44, 0.55);
+  box-shadow: 0 0 0 3px rgba(245, 196, 69, 0.35);
+}
+
+/* 主按钮 / 次按钮 */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-accent);
+  color: #FFF6E8;
+  border: 2px solid rgba(74, 50, 42, 0.85);
+  border-radius: 14px;
+  padding: 10px 18px;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-primary:active { transform: translate(1px, 2px); box-shadow: 1px 1px 0 rgba(74, 50, 42, 0.14); }
+.btn-primary:disabled { opacity: 0.45; }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  border: 2px solid rgba(74, 50, 42, 0.55);
+  border-radius: 14px;
+  padding: 9px 16px;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-ghost:active { transform: translate(1px, 2px); box-shadow: 1px 1px 0 rgba(74, 50, 42, 0.14); }
+
+/* 步骤时间轴连接线 */
+.step-line {
+  position: absolute;
+  left: 16px;
+  top: 34px;
+  bottom: -10px;
+  width: 0;
+  border-left: 2.5px dashed rgba(200, 69, 44, 0.35);
+}
+
+/* 滚动条 */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(138, 106, 85, 0.35);
+  border-radius: 8px;
+  border: 2px solid var(--color-paper);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }

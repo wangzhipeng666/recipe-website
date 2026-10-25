@@ -9,6 +9,7 @@ import { RecipeForm } from './components/RecipeForm'
 import { ChatPage } from './components/ChatPage'
 
 type Page = 'home' | 'detail' | 'add' | 'edit' | 'chat'
+type Tab = 'home' | 'favorites' | 'chat'
 
 // --- Hash 路由工具 ---
 interface HashState {
@@ -53,7 +54,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState(initHash.category)
   const [searchQuery, setSearchQuery] = useState(initHash.search)
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'home' | 'favorites' | 'chat'>('home')
+  const [tab, setTab] = useState<Tab>('home')
 
   // 同步 hash → state（浏览器前进/后退时）
   useEffect(() => {
@@ -77,6 +78,17 @@ function App() {
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
+
+  // 初始加载/刷新直接落在详情页时，按 hash 里的 id 拉取菜谱
+  useEffect(() => {
+    if (page === 'detail' && !selectedRecipe) {
+      const id = getHashRecipeId()
+      if (id) {
+        api.getRecipe(id).then(setSelectedRecipe).catch(() => {})
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
 
   // 包装导航，同步到 hash（home 页携带 category/search）
   const navigate = (newPage: Page, recipeId?: number) => {
@@ -140,164 +152,271 @@ function App() {
     }
   }
 
-  if (page === 'detail' && selectedRecipe) {
-    return (
-      <RecipeDetail
-        recipe={selectedRecipe}
-        onBack={() => navigate('home')}
-        onFavorite={() => handleToggleFavorite(selectedRecipe.id)}
-        onEdit={() => navigate('edit')}
-        onDelete={() => handleDelete(selectedRecipe.id)}
-      />
-    )
+  const goTab = (t: Tab) => {
+    setTab(t)
+    if (t === 'chat') {
+      navigate('chat')
+    } else {
+      navigate('home')
+      loadRecipes()
+    }
   }
 
-  if (page === 'add' || page === 'edit') {
-    return (
-      <RecipeForm
-        categories={categories}
-        initial={page === 'edit' ? selectedRecipe || undefined : undefined}
-        onSave={() => {
-          loadRecipes()
-          navigate('home')
-        }}
-        onCancel={() => navigate('home')}
-      />
-    )
-  }
+  const activeTab: Tab = page === 'chat' ? 'chat' : tab
+  const showChrome = page === 'home' || page === 'chat'
 
-  if (page === 'chat') {
-    return (
-      <div className="flex flex-col h-screen pb-16">
-        <header className="sticky top-0 bg-white/90 backdrop-blur border-b border-orange-100 z-10 px-4 pt-4 pb-3">
-          <h1 className="text-xl font-bold text-gray-800">💬 对话添加菜谱</h1>
-          <p className="text-xs text-gray-400 mt-0.5">告诉我菜名，我来帮你生成菜谱</p>
-        </header>
-        <div className="flex-1 overflow-hidden">
-          <ChatPage />
-        </div>
-        <BottomNav tab={tab} onTabChange={(t) => { setTab(t); navigate(t === 'chat' ? 'chat' : 'home'); if (t !== 'chat') loadRecipes() }} onAdd={() => navigate('add')} />
+  return (
+    <div className="min-h-screen flex flex-col">
+      <TopNav tab={activeTab} onTab={goTab} onAdd={() => navigate('add')} />
+
+      <div className="flex-1" key={page}>
+        {page === 'detail' && selectedRecipe ? (
+          <RecipeDetail
+            recipe={selectedRecipe}
+            onBack={() => navigate('home')}
+            onFavorite={() => handleToggleFavorite(selectedRecipe.id)}
+            onEdit={() => navigate('edit')}
+            onDelete={() => handleDelete(selectedRecipe.id)}
+          />
+        ) : page === 'add' || page === 'edit' ? (
+          <RecipeForm
+            categories={categories}
+            initial={page === 'edit' ? selectedRecipe || undefined : undefined}
+            onSave={() => {
+              loadRecipes()
+              navigate('home')
+            }}
+            onCancel={() => navigate('home')}
+          />
+        ) : page === 'chat' ? (
+          <div className="flex flex-col h-[calc(100dvh-60px)] md:h-[calc(100dvh-66px)]">
+            <div className="md:hidden px-4 pt-3 pb-1 bg-transparent">
+              <h1 className="font-display text-xl tracking-wider">💬 对话添加菜谱</h1>
+              <p className="text-xs text-ink-soft mt-0.5">告诉我菜名，我来帮你生成菜谱</p>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <ChatPage />
+            </div>
+          </div>
+        ) : (
+          <HomeView
+            recipes={recipes}
+            categories={categories}
+            loading={loading}
+            tab={tab}
+            searchQuery={searchQuery}
+            selectedCategory={selectedCategory}
+            onSearch={setSearchQuery}
+            onSelectCategory={setSelectedCategory}
+            onOpenRecipe={(r) => {
+              setSelectedRecipe(r)
+              navigate('detail', r.id)
+            }}
+            onFavorite={handleToggleFavorite}
+            onAdd={() => navigate('add')}
+            onGoChat={() => goTab('chat')}
+          />
+        )}
       </div>
-    )
-  }
 
+      {showChrome && (
+        <BottomNav tab={activeTab} onTab={goTab} onAdd={() => navigate('add')} />
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- 首页
+
+function HomeView({
+  recipes, categories, loading, tab, searchQuery, selectedCategory,
+  onSearch, onSelectCategory, onOpenRecipe, onFavorite, onAdd, onGoChat,
+}: {
+  recipes: Recipe[]
+  categories: Category[]
+  loading: boolean
+  tab: Tab
+  searchQuery: string
+  selectedCategory: string
+  onSearch: (q: string) => void
+  onSelectCategory: (c: string) => void
+  onOpenRecipe: (r: Recipe) => void
+  onFavorite: (id: number, e?: React.MouseEvent) => void
+  onAdd: () => void
+  onGoChat: () => void
+}) {
   const displayRecipes = tab === 'favorites' ? recipes.filter((r) => r.is_favorite) : recipes
 
   return (
-    <div className="flex flex-col min-h-screen pb-20">
-      <header className="sticky top-0 bg-white/90 backdrop-blur border-b border-orange-100 z-10">
-        <div className="px-4 pt-4 pb-3">
+    <div className="pb-24 md:pb-12">
+      {/* 移动端吸顶头部 */}
+      <header className="sticky top-0 z-20 md:hidden bg-paper/95 backdrop-blur-sm border-b-2 border-ink/10">
+        <div className="px-4 pt-3.5 pb-3">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl font-bold text-gray-800">
-              {tab === 'favorites' ? '❤️ 我的收藏' : '🍳 我的菜谱'}
-            </h1>
-            <button
-              onClick={() => navigate('add')}
-              className="w-11 h-11 rounded-full bg-orange-500 text-white flex items-center justify-center text-lg shadow-sm"
-            >
-              +
-            </button>
+            <div className="flex items-center gap-2.5">
+              <span className="seal w-9 h-9 text-base rotate-[-4deg]">菜</span>
+              <h1 className="font-display text-xl tracking-wide">
+                {tab === 'favorites' ? '我的收藏' : '私房菜谱'}
+              </h1>
+            </div>
+            <span className="text-xs text-ink-soft font-hand text-base">
+              {tab === 'favorites' ? `${displayRecipes.length} 道喜欢` : `共 ${recipes.length} 道`}
+            </span>
           </div>
           {tab === 'home' && (
             <>
-              <SearchBar onSearch={setSearchQuery} />
+              <SearchBar onSearch={onSearch} initial={searchQuery} />
               <div className="mt-3">
-                <CategoryFilter
-                  categories={categories}
-                  selected={selectedCategory}
-                  onSelect={setSelectedCategory}
-                />
+                <CategoryFilter categories={categories} selected={selectedCategory} onSelect={onSelectCategory} />
               </div>
             </>
           )}
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-4">
+      {/* 桌面头部 */}
+      <div className="hidden md:block max-w-6xl mx-auto px-6 pt-10">
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <h1 className="font-display text-4xl tracking-wider">
+              {tab === 'favorites' ? '我的收藏' : '今天吃什么？'}
+            </h1>
+            <p className="font-hand text-xl text-ink-soft mt-1">
+              {tab === 'favorites' ? `${displayRecipes.length} 道最喜欢的菜` : `手作家常菜 · 共 ${recipes.length} 道`}
+            </p>
+          </div>
+          {tab === 'home' && (
+            <div className="flex-1 max-w-md">
+              <SearchBar onSearch={onSearch} initial={searchQuery} />
+            </div>
+          )}
+        </div>
+        {tab === 'home' && (
+          <div className="mt-5">
+            <CategoryFilter categories={categories} selected={selectedCategory} onSelect={onSelectCategory} />
+          </div>
+        )}
+      </div>
+
+      <main className="max-w-6xl mx-auto px-4 md:px-6 pt-4 md:pt-7">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-gray-400">
-            加载中...
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 md:gap-5">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="paper-card overflow-hidden">
+                <div className="skeleton aspect-[2.15/1] rounded-none" />
+                <div className="p-3.5 space-y-2.5">
+                  <div className="skeleton h-5 w-3/5" />
+                  <div className="skeleton h-3.5 w-2/5" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : displayRecipes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-            <span className="text-5xl mb-4">{tab === 'favorites' ? '💔' : '🍽️'}</span>
-            <p className="text-lg mb-2">
-              {tab === 'favorites' ? '还没有收藏的菜谱' : '还没有菜谱'}
+          <div className="flex flex-col items-center justify-center py-20 animate-fade-up">
+            <span className="text-6xl mb-5">{tab === 'favorites' ? '🤍' : '🍽️'}</span>
+            <p className="font-display text-2xl">
+              {tab === 'favorites' ? '还没有收藏的菜谱' : searchQuery || selectedCategory ? '没有找到匹配的菜谱' : '菜谱本还是空的'}
             </p>
-            {tab === 'home' && (
-              <div className="flex flex-col items-center gap-2 mt-2">
-                <button
-                  onClick={() => navigate('add')}
-                  className="text-orange-500 font-medium"
-                >
-                  添加第一个菜谱 →
-                </button>
-                <span className="text-xs text-gray-400">或试试对话添加 💬</span>
+            <p className="font-hand text-lg text-ink-soft mt-2">
+              {tab === 'favorites' ? '做菜的时候记得点右上角的小爱心呀' : '从第一道家常菜开始记录吧'}
+            </p>
+            {tab === 'home' && !searchQuery && !selectedCategory && (
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+                <button onClick={onAdd} className="btn-primary">✚ 添加菜谱</button>
+                <button onClick={onGoChat} className="btn-ghost">💬 试试对话添加</button>
               </div>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 md:gap-5">
             {displayRecipes.map((recipe) => (
               <RecipeCard
                 key={recipe.id}
                 recipe={recipe}
-                onClick={() => {
-                  setSelectedRecipe(recipe)
-                  navigate('detail', recipe.id)
-                }}
-                onFavorite={(e) => handleToggleFavorite(recipe.id, e)}
+                onClick={() => onOpenRecipe(recipe)}
+                onFavorite={(e) => onFavorite(recipe.id, e)}
               />
             ))}
           </div>
         )}
       </main>
-
-      <BottomNav tab={tab} onTabChange={(t) => { setTab(t); navigate(t === 'chat' ? 'chat' : 'home'); if (t !== 'chat') loadRecipes() }} onAdd={() => navigate('add')} />
     </div>
   )
 }
 
-function BottomNav({ tab, onTabChange, onAdd }: { tab: string; onTabChange: (t: 'home' | 'favorites' | 'chat') => void; onAdd: () => void }) {
+// ---------------------------------------------------------------- 桌面顶栏
+
+function TopNav({ tab, onTab, onAdd }: { tab: Tab; onTab: (t: Tab) => void; onAdd: () => void }) {
+  const items: Array<{ key: Tab; label: string; icon: string }> = [
+    { key: 'home', label: '菜谱', icon: '📖' },
+    { key: 'favorites', label: '收藏', icon: '❤️' },
+    { key: 'chat', label: '对话', icon: '💬' },
+  ]
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-orange-100 z-20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-      <div className="flex">
-        <button
-          onClick={() => onTabChange('home')}
-          className={`flex-1 pt-3 pb-2 flex flex-col items-center gap-0.5 transition-colors min-h-[48px] ${
-            tab === 'home' ? 'text-orange-500' : 'text-gray-400'
-          }`}
-        >
-          <span className="text-xl">🏠</span>
-          <span className="text-xs">首页</span>
+    <header className="hidden md:block sticky top-0 z-30 bg-cream/95 backdrop-blur-sm border-b-2 border-ink/10">
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center gap-8">
+        <button onClick={() => onTab('home')} className="flex items-center gap-3 shrink-0">
+          <span className="seal w-10 h-10 text-xl rotate-[-5deg]">菜</span>
+          <span className="font-display text-2xl tracking-widest">私房菜谱</span>
         </button>
-        <button
-          onClick={() => onTabChange('chat')}
-          className={`flex-1 pt-3 pb-2 flex flex-col items-center gap-0.5 transition-colors min-h-[48px] ${
-            tab === 'chat' ? 'text-orange-500' : 'text-gray-400'
-          }`}
-        >
-          <span className="text-xl">💬</span>
-          <span className="text-xs">对话</span>
-        </button>
-        <button
-          onClick={() => onTabChange('favorites')}
-          className={`flex-1 pt-3 pb-2 flex flex-col items-center gap-0.5 transition-colors min-h-[48px] ${
-            tab === 'favorites' ? 'text-orange-500' : 'text-gray-400'
-          }`}
-        >
-          <span className="text-xl">❤️</span>
-          <span className="text-xs">收藏</span>
-        </button>
-        <button
-          onClick={onAdd}
-          className="flex-1 pt-3 pb-2 flex flex-col items-center gap-0.5 text-gray-400 min-h-[48px]"
-        >
-          <span className="w-11 h-11 -mt-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-2xl shadow-lg">
-            +
-          </span>
-          <span className="text-xs">添加</span>
-        </button>
+        <nav className="flex items-center gap-2">
+          {items.map((it) => (
+            <button
+              key={it.key}
+              onClick={() => onTab(it.key)}
+              className={`px-4 py-2 rounded-full font-display text-base tracking-wider transition-colors ${
+                tab === it.key
+                  ? 'bg-accent text-[#FFF6E8] border-2 border-ink/80 shadow-hard-sm'
+                  : 'text-ink/75 hover:bg-paper border-2 border-transparent'
+              }`}
+            >
+              {it.icon} {it.label}
+            </button>
+          ))}
+        </nav>
+        <div className="flex-1" />
+        <button onClick={onAdd} className="btn-primary text-base">✚ 新菜谱</button>
+      </div>
+    </header>
+  )
+}
+
+// ---------------------------------------------------------------- 移动底栏
+
+function BottomNav({ tab, onTab, onAdd }: { tab: Tab; onTab: (t: Tab) => void; onAdd: () => void }) {
+  const items: Array<{ key: Tab; label: string; icon: string }> = [
+    { key: 'home', label: '菜谱', icon: '📖' },
+    { key: 'chat', label: '对话', icon: '💬' },
+    { key: 'favorites', label: '收藏', icon: '❤️' },
+  ]
+  return (
+    <nav
+      className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-cream/97 backdrop-blur-sm border-t-2 border-ink/12"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
+      <div className="relative flex items-stretch">
+        {items.map((it, idx) => (
+          <div key={it.key} className="flex-1 flex justify-center">
+            {idx === 1 && (
+              <button
+                onClick={onAdd}
+                aria-label="添加菜谱"
+                className="absolute -top-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-accent text-[#FFF6E8] border-2 border-ink/85 shadow-hard flex items-center justify-center text-2xl active:translate-y-0.5 active:shadow-none transition-transform font-light"
+              >
+                ＋
+              </button>
+            )}
+            <button
+              onClick={() => onTab(it.key)}
+              className={`w-full pt-2.5 pb-2 flex flex-col items-center gap-0.5 transition-colors ${
+                tab === it.key ? 'text-accent' : 'text-ink-soft'
+              }`}
+            >
+              <span className="text-lg leading-none">{it.icon}</span>
+              <span className="font-display text-xs tracking-wider">{it.label}</span>
+            </button>
+          </div>
+        ))}
       </div>
     </nav>
   )
